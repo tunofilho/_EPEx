@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+    <!--<link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <link rel="stylesheet" href="css/leaflet-measure.css">
+    <link rel="stylesheet" href="css/leaflet-geoman.css" />
+    <link rel="stylesheet" href="css/Leaflet.Coordinates-0.1.3.css" />
+    <link rel="stylesheet" href="css/Leaflet.StyleEditor.min.css" />
+
+
+    <style>
+        html,
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        #export {
+            position: absolute;
+            top: 500px;
+            left: 10px;
+            padding: 2px;
+            z-index: 500;
+        }
+
+        #import {
+            position: absolute;
+            top: 470px;
+            left: 10px;
+            padding: 2px;
+            z-index: 500;
+        }
+
+        /*#progress-bar {
+            margin-top: 1em;
+            width: 100vw;
+            height: 1em;
+            background: red;
+            transition: 0.3s;
+        }
+
+
+            /*#GeoJSON,
+        #Import {
+            top: 350px;
+            left: 30px;
+
+        }*/
+
+        /*#delete,
+        #export {
+            position: absolute;
+            top: 350px;
+            left: 10px;
+            z-index: 100;
+            background: white;
+            color: black;
+            padding: 6px;
+            border-radius: 4px;
+            font-family: 'Helvetica Neue';
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        #export {
+            top: 390px;
+        }*/
+    </style>
+    <title>EPEx</title>
+</head>
+
+<body>
+
+    <div id="map"></div>
+    <button id="export">ExportGeoJson</button>
+    <input type=file id="import" accept=".geojson" value="ImportGeoJson" />
+
+    <!--<progress value="0" max="100" id="progress-bar"></progress>-->
+    <!--<div id="status"></div>-->
+
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="js/leaflet-svg-shape-markers.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <!--<script src="js/leaflet-control-geocoder.Geocoder.js"></script>-->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+
+    <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
+    <script src="https://unpkg.com/Leaflet.TileLayer.MBTiles@1.0.0/Leaflet.TileLayer.MBTiles.js"></script>
+
+
+    <script src="js/leaflet.latlng-graticule.js"></script>
+    <script type="text/javascript" src="js/Leaflet.Coordinates-0.1.3.min.js"></script>
+    <script src="js/leaflet.browser.print.min.js"></script>
+    <script src="js/Leaflet.StyleEditor.min.js"></script>
+    <!--<script src="js/leaflet.filelayer.js"></script>-->
+
+    <script src="js/leaflet-geoman.min.js"></script>
+    <script src="https://unpkg.com/esri-leaflet@2.1.3/dist/esri-leaflet.js"
+        integrity="sha512-pijLQd2FbV/7+Jwa86Mk3ACxnasfIMzJRrIlVQsuPKPCfUBCDMDUoLiBQRg7dAQY6D1rkmCcR8286hVTn/wlIg=="
+        crossorigin=""></script>
+
+    <script>
+        var map = L.map('map', {
+            zoomControl: true, maxZoom: 19, minZoom: 1, drawControl: true, center: [-7.87, -35.77], zoom: 9,
+        })
+        /*}).fitBounds([[-21.53881958301445, -58.148592817470416], [-19.815427888219396, -54.63288875256847]]);
+        }).setView([-20.241,-56.382],9);*/
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({ truncate: { length: 30, location: 'smart' } });
+        L.control.locate({ locateOptions: { maxZoom: 19 } }).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+            .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+            .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            map.setMaxBounds(map.getBounds());
+        }
+
+
+
+        //data
+        /*
+        function pop_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">NOME</th>\
+                        <td>' + (feature.properties['NOME'] !== null ? autolinker.link(feature.properties['NOME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ZONA</th>\
+                        <td>' + (feature.properties['ZONA'] !== null ? autolinker.link(feature.properties['ZONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">MUNICIPIO</th>\
+                        <td>' + (feature.properties['MUNICIPIO'] !== null ? autolinker.link(feature.properties['MUNICIPIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0_0() {
+            return {
+                pane: 'pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0');
+        map.getPane('pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0').style.zIndex = 400;
+        map.getPane('pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0').style['mix-blend-mode'] = 'normal';
+        var layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0 = new L.geoJson(json_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
+            layerName: 'layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
+            pane: 'pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
+            pmIgnore: true,
+            onEachFeature: pop_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0,
+            style: style_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0_0,
+        });
+        bounds_group.addLayer(layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0);
+        map.addLayer(layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0);
+
+
+        function pop_GISSDEESTADO_DE_MS_POLITICO_0(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Municipio'] !== null ? autolinker.link(feature.properties['Municipio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_GISSDEESTADO_DE_MS_POLITICO_0_0() {
+            return {
+                pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_0',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '0 4 0',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.8,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,0,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_GISSDEESTADO_DE_MS_POLITICO_0');
+        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_0').style.zIndex = 400;
+        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_0').style['mix-blend-mode'] = 'normal';
+
+        var layer_GISSDEESTADO_DE_MS_POLITICO_0 = new L.geoJson(json_GISSDEESTADO_DE_MS_POLITICO_0, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_GISSDEESTADO_DE_MS_POLITICO_0',
+            layerName: 'layer_GISSDEESTADO_DE_MS_POLITICO_0',
+            pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_0',
+            pmIgnore: true,
+            onEachFeature: pop_GISSDEESTADO_DE_MS_POLITICO_0,
+            style: style_GISSDEESTADO_DE_MS_POLITICO_0_0,
+        });
+        bounds_group.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_0);
+        map.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_0);
+
+
+        function pop_GISSDEESTADO_DE_MS_POLITICO_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Municipio'] !== null ? autolinker.link(feature.properties['NM_MUN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_GISSDEESTADO_DE_MS_POLITICO_1_0() {
+            return {
+                pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '0 4 0',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.8,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,0,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_GISSDEESTADO_DE_MS_POLITICO_1');
+        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_1').style.zIndex = 400;
+        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_1').style['mix-blend-mode'] = 'normal';
+
+        var layer_GISSDEESTADO_DE_MS_POLITICO_1 = new L.geoJson(json_GISSDEESTADO_DE_MS_POLITICO_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_GISSDEESTADO_DE_MS_POLITICO_1',
+            layerName: 'layer_GISSDEESTADO_DE_MS_POLITICO_1',
+            pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_1',
+            pmIgnore: true,
+            onEachFeature: pop_GISSDEESTADO_DE_MS_POLITICO_1,
+            style: style_GISSDEESTADO_DE_MS_POLITICO_1_0,
+        });
+        bounds_group.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_1);
+        map.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_1);
+
+        */
+
+
+        
+
+
+
+
+
+
+        // basemaps layers -------------------------------------------------------------
+        var bdgex_url = "https://bdgex.eb.mil.br/mapcache"
+        var wmsLayer = L.tileLayer.wms(bdgex_url, {
+            layers: 'ctmmultiescalas_mercator',
+            //})
+        }).addTo(map);
+
+        var ex = L.tileLayer.wms("https://bdgex.eb.mil.br/mapcache3857", {
+            layers: ['estados','capitais'],
+            format: 'image/png',
+        }).addTo(map);
+
+        var rapideye = L.tileLayer.wms("https://bdgex.eb.mil.br/mapcache3857", {
+            layers: 'rapideye',
+            format: 'image/png',
+        });
+
+        var cbers = L.tileLayer.wms("https://brazildatacube.dpi.inpe.br/bdc/geoserver/mosaics/ows", {
+            layers: 'mosaics:CB4-MOSAIC-BRAZIL_64_3M_STK',
+            errorTileUrl: 'error',
+        });
+
+        var imgs = L.tileLayer('data/1.RASTERS/imagens/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+        var srtm = L.tileLayer('data/1.RASTERS/srtm/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+        var carta = L.tileLayer('data/1.RASTERS/carta/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+        var buff = L.tileLayer('data/1.RASTERS/buffer_100m/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+        var drenag = L.tileLayer('data/1.RASTERS/drenagem/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+        var trecho_rod = L.tileLayer('data/1.RASTERS/rodovias/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+        var area_trans = L.tileLayer('data/1.RASTERS/area_trans/{z}/{x}/{y}.png', {
+            minZoom: 1,
+            maxZoom: 19,
+            tms:true,
+
+        });
+
+
+        var baseMaps = {
+            "Blank": L.tileLayer(''),
+            "cbers_2023": cbers,
+            "rapideye_2012": rapideye,
+            "imagens":imgs,
+            "srtm":srtm,
+            "carta_esp": carta,
+
+        };
+
+        L.control.layers(baseMaps, {
+            '<img src=""/> Transitabilidade_Bld': area_trans,
+            '<img src=""/> Buffer_100m': buff,
+            '<img src=""/> Drenagem': drenag,
+            '<img src=""/> Trecho_Rod': trecho_rod,
+
+        
+        //    '<img src="legend/GISSDEESTADO_DE_MS_POLITICO_0.png" /> Sedes_Mun_MS': layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0,
+        //    '<img src="legend/GISSDEESTADO_DE_MS_POLITICO_0.png" /> MS_POLITICO': layer_GISSDEESTADO_DE_MS_POLITICO_0,
+        //    '<img src="legend/GISSDEESTADO_DE_MS_POLITICO_0.png" /> MT_POLITICO': layer_GISSDEESTADO_DE_MS_POLITICO_1,
+
+        }).addTo(map);
+        
+
+
+        //abstract -------------------------------------------------------------
+        /*var abstract = new L.Control({ 'position': 'bottomright' });
+        abstract.onAdd = function (map) {
+            this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+            this._div.id = 'abstract'
+
+            abstract.show();
+            return this._div;
+        };
+        abstract.show = function () {
+            this._div.classList.remove("abstract");
+            this._div.classList.add("abstractUncollapsed");
+            this._div.innerHTML = 'visualização de estruturas de relevância no terreno para planejamento operações logística.';
+        };
+        abstract.addTo(map);*/
+
+        //plugin geocoder -------------------------------------------------------------
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .title += 'Search for a place';
+
+        
+        // texto nos layers -------------------------------------------------------------
+        //setBounds();
+        /*
+        var i = 0;
+        layer_GISSDEESTADO_DE_MS_POLITICO_0.eachLayer(function (layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Municipio'] !== null ? String('<div style="color: #fbfcfc ; font-size: 12pt; font-family: \'Liberation Sans\', sans-serif;">' + layer.feature.properties['Municipio']) + '</div>' : ''), { permanent: true, offset: [-0, -16], className: 'css_GISSDEESTADO_DE_MS_POLITICO_0' });
+            labels.push(layer);
+            totalMarkers += 1;
+            layer.added = true;
+            addLabel(layer, i);
+            i++;
+        });
+
+        var i = 0;
+        layer_GISSDEESTADO_DE_MS_POLITICO_1.eachLayer(function (layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NM_MUN'] !== null ? String('<div style="color: #fbfcfc ; font-size: 12pt; font-family: \'Liberation Sans\', sans-serif;">' + layer.feature.properties['NM_MUN']) + '</div>' : ''), { permanent: true, offset: [-0, -16], className: 'css_GISSDEESTADO_DE_MS_POLITICO_1' });
+            labels.push(layer);
+            totalMarkers += 1;
+            layer.added = true;
+            addLabel(layer, i);
+            i++;
+        });
+
+        resetLabels([layer_GISSDEESTADO_DE_MS_POLITICO_0, layer_GISSDEESTADO_DE_MS_POLITICO_1]);
+        map.on("zoomend", function () {
+            resetLabels([layer_GISSDEESTADO_DE_MS_POLITICO_0, layer_GISSDEESTADO_DE_MS_POLITICO_1]);
+        });
+        map.on("layeradd", function () {
+            resetLabels([layer_GISSDEESTADO_DE_MS_POLITICO_0, layer_GISSDEESTADO_DE_MS_POLITICO_1]);
+        });
+        map.on("layerremove", function () {
+            resetLabels([layer_GISSDEESTADO_DE_MS_POLITICO_0, layer_GISSDEESTADO_DE_MS_POLITICO_1]);
+        });*/
+
+
+
+        L.control.scale({
+            metric: true,
+            imperial: false,
+            maxWidth: 100,
+            position: "bottomleft"
+
+        }).addTo(map);
+
+        L.control.coordinates({
+            position: "bottomleft", //optional default "bootomright"
+            decimals: 4, //optional default 4
+            decimalSeperator: ".", //optional default "."
+            labelTemplateLat: "Latitude: {y}", //optional default "Lat: {y}"
+            labelTemplateLng: "Longitude: {x}", //optional default "Lng: {x}"
+            enableUserInput: true, //optional default true
+            useDMS: false, //optional default false
+            useLatLngOrder: true, //ordering of labels, default false-> lng-lat
+            markerType: L.marker, //optional default L.marker
+            markerProps: {}, //optional default {},
+            labelFormatterLng: function (lng) { return lng + " lng" }, //optional default none,
+            labelFormatterLat: function (lat) { return lat + " lat" }, //optional default none
+            customLabelFcn: function (latLonObj, opts) { "Geohash: " + encodeGeoHash(latLonObj.lat, latLonObj.lng) } //optional default none
+        }).addTo(map);
+
+        L.latlngGraticule({
+            showLabel: true,
+            dashArray: [5, 5],
+            zoomInterval: [
+                { start: 2, end: 3, interval: 30 },
+                { start: 4, end: 4, interval: 10 },
+                { start: 5, end: 7, interval: 5 },
+                { start: 8, end: 10, interval: 1 },
+                { start: 11, end: 16, interval: 0.25 }
+            ]
+        }).addTo(map);
+
+        map.pm.addControls({
+            position: 'topright',
+            drawMarker: true,
+            drawCircleMarker: true,
+            rotateMode: true,
+            oneBlock: false,
+        });
+        
+
+        function generateGeoJson() {
+            var fg = L.featureGroup();
+            var layers = findLayers(map);
+            //var layers = groupDraw.getLayers();
+            //debugger;
+            var geo = {
+                type: "FeatureCollection",
+                features: [],
+            };
+            //debugger;
+            layers.forEach(function (layer) {
+                var geoJson = JSON.parse(JSON.stringify(layer.toGeoJSON()));
+                if (!geoJson.properties) {
+                    geoJson.properties = {};
+                }
+                //debugger;
+                geoJson.properties.options = JSON.parse(JSON.stringify(layer.options));
+                //debugger;
+                if (layer.options.radius) {
+                    var radius = parseFloat(layer.options.radius);
+                    if (radius % 1 !== 0) {
+                        geoJson.properties.options.radius = radius.toFixed(6);
+                    } else {
+                        geoJson.properties.options.radius = radius.toFixed(0);
+                    }
+                }
+                //debugger;
+
+                if (layer instanceof L.Rectangle) {
+                    geoJson.properties.type = "rectangle";
+                } else if (layer instanceof L.Circle) {
+                    geoJson.properties.type = "circle";
+                } else if (layer instanceof L.CircleMarker) {
+                    geoJson.properties.type = "circlemarker";
+                } else if (layer instanceof L.Polygon) {
+                    geoJson.properties.type = "polygon";
+                } else if (layer instanceof L.Polyline) {
+                    geoJson.properties.type = "polyline";
+                } else if (layer instanceof L.Marker) {
+                    geoJson.properties.type = "marker";
+                }
+
+                geo.features.push(geoJson);
+            });
+            //debugger;
+            //console.log(JSON.stringify(geo));
+            //alert(JSON.stringify(geo))
+            return geo
+        }
+
+
+        function findLayers(map) {
+            var layers = [];
+            map.eachLayer(layer => {
+                if (
+                    layer instanceof L.Polyline ||
+                    layer instanceof L.Marker ||
+                    layer instanceof L.Circle ||
+                    layer instanceof L.CircleMarker
+                ) {
+                    layers.push(layer);
+                }
+            });
+            //debugger;
+            // filter out layers that don't have the leaflet-geoman instance
+            layers = layers.filter(layer => layer.pm);
+            //debugger;
+            // filter out everything that's leaflet-geoman specific temporary stuff
+            //layers = layers.filter(layer => !layer._pmTempLayer);
+            layers = layers.filter(layer => layer._drawnByGeoman);
+            //debugger;
+            return layers;
+        }
+
+
+        function importGeo() {
+            var prom = prompt();
+            if (prom) {
+                importGeoJSON(JSON.parse(prom));
+            }
+        }
+
+        function importGeoJSON(feature) {
+            var geoLayer = L.geoJSON(feature, {
+                style: function (feature) {
+                    return feature.properties.options;
+                },
+                pointToLayer: function (feature, latlng) {
+                    switch (feature.properties.type) {
+                        case "marker": return new L.Marker(latlng);
+                        case "circle": return new L.Circle(latlng, feature.properties.options);
+                        case "circlemarker": return new L.CircleMarker(latlng, feature.properties.options);
+                    }
+                }
+            });
+
+            geoLayer.getLayers().forEach((layer) => {
+                if (layer._latlng) {
+                    var latlng = layer.getLatLng();
+                } else {
+                    var latlng = layer.getLatLngs();
+                }
+                switch (layer.feature.properties.type) {
+                    case "rectangle":
+                        new L.Rectangle(latlng, layer.options).addTo(map);
+                        break;
+                    case "circle":
+                        console.log(layer.options)
+                        new L.Circle(latlng, layer.options).addTo(map);
+                        break;
+                    case "polygon":
+                        new L.Polygon(latlng, layer.options).addTo(map);
+                        break;
+                    case "polyline":
+                        new L.Polyline(latlng, layer.options).addTo(map);
+                        break;
+                    case "marker":
+                        if (layer.feature.properties.options.textMarker) {
+                            new L.Marker(latlng, {
+                                textMarker: true,
+                                text: layer.feature.properties.options.text,
+                            }).addTo(map)
+                        } else {
+                            new L.Marker(latlng, layer.options).addTo(map);
+                        }
+                        break;
+                    case "circlemarker":
+                        new L.CircleMarker(latlng, layer.options).addTo(map);
+                        break;
+                }
+            })
+        }
+
+        // style editor plugin
+        var styleEditor = L.control.styleEditor({
+            position: "bottomright"
+        });
+        map.addControl(styleEditor);
+
+        //export drawing objects
+        function downloadObjectAsJson(exportObj, exportName) {
+            let nodata = '{"type":"FeatureCollection","features":[]}';
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+            let datenow = new Date();
+            let datenowstr = datenow.toLocaleDateString('pt-BR');
+            var downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", exportName + datenowstr + ".geojson");
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            debugger;
+            if (JSON.stringify(exportObj) == nodata) {
+                alert('No features are drawn');
+            } else {
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }
+        }
+        var button_exp = document.getElementById('export');
+        button_exp.addEventListener('click', () => downloadObjectAsJson(generateGeoJson(), "arquivo_"));
+
+        // Read input file
+        var button_imp = document.getElementById('import');
+        /*button_imp.addEventListener('change', function (event) {
+            var file = button_imp.files[0],
+                fr = new FileReader();
+            button_imp.value = ''; // Clear the input.
+            debugger;
+            fr.onload = console.log(fr.result);
+            debugger;
+            fr.onload = importGeoJSON(fr.result);
+        })*/
+
+        //const changeStatus = (status) => {
+        //    document.getElementById('status').innerHTML = status;
+        //}
+        /*const setProgress = (e) => {
+            const fr = e.target;
+            const loadingPercentage = 100 * e.loaded / e.total;
+
+            document.getElementById('progress-bar').value = loadingPercentage;
+        }*/
+        const loaded = (e) => {
+            const fr = e.target;
+            var result = fr.result;
+
+            //changeStatus('Finished Loading!');
+            console.log('Result:', result);
+            //reading drawing objects
+            importGeoJSON(JSON.parse(result));
+        }
+        //const errorHandler = (e) => {
+        //    changeStatus('Error: ' + e.target.error.name);
+        //}
+        const processFile = (file) => {
+            const fr = new FileReader();
+
+            //fr.readAsDataURL(file);
+            fr.readAsText(file)
+            //fr.addEventListener('loadstart', changeStatus('Start Loading'));
+            //fr.addEventListener('load', changeStatus('Loaded'));
+            fr.addEventListener('loadend', loaded);
+            //fr.addEventListener('progress', setProgress);
+            //fr.addEventListener('error', errorHandler);
+            //fr.addEventListener('abort', changeStatus('Interrupted'));
+        }
+
+        document.getElementById('import').addEventListener('change', (e) => {
+            const file = document.getElementById('import').files[0];
+
+            if (file) {
+                processFile(file);
+            }
+        });
+
+
+
+        // print plugin
+        var customActionToPrint = function (context, mode) {
+            return function () {
+                window.alert("We are printing the MAP. Let's do Custom print here!");
+                context._printMode(mode);
+            }
+        };
+
+        L.control.browserPrint({
+            title: 'Print Map',
+            //documentTitle: 'Map printed using leaflet.browser.print plugin',
+
+            closePopupsOnPrint: false,
+            printModes: [
+                L.BrowserPrint.Mode.Landscape("Tabloid", { title: "Tabloid VIEW" }),
+                L.browserPrint.mode("Alert", { title: "User specified print action", pageSize: "A4", action: customActionToPrint, invalidateBounds: false }),
+                L.BrowserPrint.Mode.Landscape(),
+                "Portrait",
+                L.BrowserPrint.Mode.Auto("A4", { title: "Auto" }),
+                L.BrowserPrint.Mode.Custom("A4", { title: "Select area" })
+            ],
+            manualMode: false
+        }).addTo(map);
+
+
+
+    </script>
+</body>
+
+</html>
