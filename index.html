@@ -45,42 +45,6 @@
             padding: 2px;
             z-index: 500;
         }
-
-        /*#progress-bar {
-            margin-top: 1em;
-            width: 100vw;
-            height: 1em;
-            background: red;
-            transition: 0.3s;
-        }
-
-
-            /*#GeoJSON,
-        #Import {
-            top: 350px;
-            left: 30px;
-
-        }*/
-
-        /*#delete,
-        #export {
-            position: absolute;
-            top: 350px;
-            left: 10px;
-            z-index: 100;
-            background: white;
-            color: black;
-            padding: 6px;
-            border-radius: 4px;
-            font-family: 'Helvetica Neue';
-            cursor: pointer;
-            font-size: 12px;
-            text-decoration: none;
-        }
-
-        #export {
-            top: 390px;
-        }*/
     </style>
     <title>EPEx</title>
 </head>
@@ -90,10 +54,6 @@
     <div id="map"></div>
     <button id="export">ExportGeoJson</button>
     <input type=file id="import" accept=".geojson" value="ImportGeoJson" />
-
-    <!--<progress value="0" max="100" id="progress-bar"></progress>-->
-    <!--<div id="status"></div>-->
-
     <script src="js/qgis2web_expressions.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/L.Control.Locate.min.js"></script>
@@ -117,7 +77,16 @@
     <script type="text/javascript" src="js/Leaflet.Coordinates-0.1.3.min.js"></script>
     <script src="js/leaflet.browser.print.min.js"></script>
     <script src="js/Leaflet.StyleEditor.min.js"></script>
-    <!--<script src="js/leaflet.filelayer.js"></script>-->
+    <script src="data/Transitabilidade_Blindados_0.js"></script>
+    <script src="data/Poligono_Tiro_1.js"></script>
+    <script src="data/Vegetacao_2.js"></script>
+    <script src="data/Estrada_Mussurepe_3.js"></script>
+    <script src="data/Area_Selecionada_ESE_4.js"></script>
+    <script src="data/Area_RecargaTopo_Morro_5.js"></script>
+    <script src="data/Area_Edificada_6.js"></script>
+    <script src="data/Area_Dest_Com_Conv_7.js"></script>
+    <script src="data/area_CIMNC_8.js"></script>
+    <script src="data/area_APA_9.js"></script>    
 
     <script src="js/leaflet-geoman.min.js"></script>
     <script src="https://unpkg.com/esri-leaflet@2.1.3/dist/esri-leaflet.js"
@@ -153,36 +122,337 @@
 
 
 
-        //data
-        /*
-        function pop_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0(feature, layer) {
+        //data -------------------------------------------------------------
+
+        function pop_Transitabilidade_Blindados_0(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">NOME</th>\
-                        <td>' + (feature.properties['NOME'] !== null ? autolinker.link(feature.properties['NOME'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">TIPO</th>\
-                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">ZONA</th>\
-                        <td>' + (feature.properties['ZONA'] !== null ? autolinker.link(feature.properties['ZONA'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">MUNICIPIO</th>\
-                        <td>' + (feature.properties['MUNICIPIO'] !== null ? autolinker.link(feature.properties['MUNICIPIO'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             layer.bindPopup(popupContent, { maxHeight: 400 });
         }
 
-        function style_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0_0() {
+        function style_Transitabilidade_Blindados_0_0() {
             return {
-                pane: 'pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
+                pane: 'pane_Transitabilidade_Blindados_0',
                 opacity: 1,
-                color: 'rgba(35,35,35,1.0)',
+                color: 'rgba(0,0,0,0.4)',
                 dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,52,55,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Transitabilidade_Blindados_0');
+        map.getPane('pane_Transitabilidade_Blindados_0').style.zIndex = 409;
+        map.getPane('pane_Transitabilidade_Blindados_0').style['mix-blend-mode'] = 'normal';
+        var layer_Transitabilidade_Blindados_0 = new L.geoJson(json_Transitabilidade_Blindados_0, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Transitabilidade_Blindados_0',
+            layerName: 'layer_Transitabilidade_Blindados_0',
+            pane: 'pane_Transitabilidade_Blindados_0',
+            onEachFeature: pop_Transitabilidade_Blindados_0,
+            style: style_Transitabilidade_Blindados_0_0,
+        });
+        bounds_group.addLayer(layer_Transitabilidade_Blindados_0);
+        function pop_Poligono_Tiro_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">nome</th>\
+                        <td>' + (feature.properties['nome'] !== null ? autolinker.link(feature.properties['nome'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Poligono_Tiro_1_0() {
+            return {
+                pane: 'pane_Poligono_Tiro_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Poligono_Tiro_1');
+        map.getPane('pane_Poligono_Tiro_1').style.zIndex = 408;
+        map.getPane('pane_Poligono_Tiro_1').style['mix-blend-mode'] = 'normal';
+        var layer_Poligono_Tiro_1 = new L.geoJson(json_Poligono_Tiro_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Poligono_Tiro_1',
+            layerName: 'layer_Poligono_Tiro_1',
+            pane: 'pane_Poligono_Tiro_1',
+            onEachFeature: pop_Poligono_Tiro_1,
+            style: style_Poligono_Tiro_1_0,
+        });
+        bounds_group.addLayer(layer_Poligono_Tiro_1);
+        function pop_Vegetacao_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">nome</th>\
+                        <td>' + (feature.properties['nome'] !== null ? autolinker.link(feature.properties['nome'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Vegetacao_2_0() {
+            return {
+                pane: 'pane_Vegetacao_2',
+                stroke: false,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(148,209,128,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Vegetacao_2');
+        map.getPane('pane_Vegetacao_2').style.zIndex = 403;
+        map.getPane('pane_Vegetacao_2').style['mix-blend-mode'] = 'normal';
+        var layer_Vegetacao_2 = new L.geoJson(json_Vegetacao_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Vegetacao_2',
+            layerName: 'layer_Vegetacao_2',
+            pane: 'pane_Vegetacao_2',
+            onEachFeature: pop_Vegetacao_2,
+            style: style_Vegetacao_2_0,
+        });
+        bounds_group.addLayer(layer_Vegetacao_2);
+        function pop_Estrada_Mussurepe_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">nome</th>\
+                        <td>' + (feature.properties['nome'] !== null ? autolinker.link(feature.properties['nome'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Estrada_Mussurepe_3_0() {
+            return {
+                pane: 'pane_Estrada_Mussurepe_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Estrada_Mussurepe_3');
+        map.getPane('pane_Estrada_Mussurepe_3').style.zIndex = 406;
+        map.getPane('pane_Estrada_Mussurepe_3').style['mix-blend-mode'] = 'normal';
+        var layer_Estrada_Mussurepe_3 = new L.geoJson(json_Estrada_Mussurepe_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Estrada_Mussurepe_3',
+            layerName: 'layer_Estrada_Mussurepe_3',
+            pane: 'pane_Estrada_Mussurepe_3',
+            onEachFeature: pop_Estrada_Mussurepe_3,
+            style: style_Estrada_Mussurepe_3_0,
+        });
+        bounds_group.addLayer(layer_Estrada_Mussurepe_3);
+        function pop_Area_Selecionada_ESE_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Area_Selecionada_ESE_4_0() {
+            return {
+                pane: 'pane_Area_Selecionada_ESE_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(152,125,183,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Area_Selecionada_ESE_4');
+        map.getPane('pane_Area_Selecionada_ESE_4').style.zIndex = 405;
+        map.getPane('pane_Area_Selecionada_ESE_4').style['mix-blend-mode'] = 'normal';
+        var layer_Area_Selecionada_ESE_4 = new L.geoJson(json_Area_Selecionada_ESE_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Area_Selecionada_ESE_4',
+            layerName: 'layer_Area_Selecionada_ESE_4',
+            pane: 'pane_Area_Selecionada_ESE_4',
+            onEachFeature: pop_Area_Selecionada_ESE_4,
+            style: style_Area_Selecionada_ESE_4_0,
+        });
+        bounds_group.addLayer(layer_Area_Selecionada_ESE_4);
+        function pop_Area_RecargaTopo_Morro_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Area_RecargaTopo_Morro_5_0() {
+            return {
+                pane: 'pane_Area_RecargaTopo_Morro_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Area_RecargaTopo_Morro_5');
+        map.getPane('pane_Area_RecargaTopo_Morro_5').style.zIndex = 404;
+        map.getPane('pane_Area_RecargaTopo_Morro_5').style['mix-blend-mode'] = 'normal';
+        var layer_Area_RecargaTopo_Morro_5 = new L.geoJson(json_Area_RecargaTopo_Morro_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Area_RecargaTopo_Morro_5',
+            layerName: 'layer_Area_RecargaTopo_Morro_5',
+            pane: 'pane_Area_RecargaTopo_Morro_5',
+            onEachFeature: pop_Area_RecargaTopo_Morro_5,
+            style: style_Area_RecargaTopo_Morro_5_0,
+        });
+        bounds_group.addLayer(layer_Area_RecargaTopo_Morro_5);
+        function pop_Area_Edificada_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Edificação</th>\
+                        <td>' + (feature.properties['Edificação'] !== null ? autolinker.link(feature.properties['Edificação'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Area_Edificada_6_0() {
+            return {
+                pane: 'pane_Area_Edificada_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,154,153,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Area_Edificada_6');
+        map.getPane('pane_Area_Edificada_6').style.zIndex = 407;
+        map.getPane('pane_Area_Edificada_6').style['mix-blend-mode'] = 'normal';
+        var layer_Area_Edificada_6 = new L.geoJson(json_Area_Edificada_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Area_Edificada_6',
+            layerName: 'layer_Area_Edificada_6',
+            pane: 'pane_Area_Edificada_6',
+            onEachFeature: pop_Area_Edificada_6,
+            style: style_Area_Edificada_6_0,
+        });
+        bounds_group.addLayer(layer_Area_Edificada_6);
+        function pop_Area_Dest_Com_Conv_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_Area_Dest_Com_Conv_7_0() {
+            return {
+                pane: 'pane_Area_Dest_Com_Conv_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(166,206,227,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Area_Dest_Com_Conv_7');
+        map.getPane('pane_Area_Dest_Com_Conv_7').style.zIndex = 402;
+        map.getPane('pane_Area_Dest_Com_Conv_7').style['mix-blend-mode'] = 'normal';
+        var layer_Area_Dest_Com_Conv_7 = new L.geoJson(json_Area_Dest_Com_Conv_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Area_Dest_Com_Conv_7',
+            layerName: 'layer_Area_Dest_Com_Conv_7',
+            pane: 'pane_Area_Dest_Com_Conv_7',
+            onEachFeature: pop_Area_Dest_Com_Conv_7,
+            style: style_Area_Dest_Com_Conv_7_0,
+        });
+        bounds_group.addLayer(layer_Area_Dest_Com_Conv_7);
+        function pop_area_CIMNC_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">NOCAD</th>\
+                        <td>' + (feature.properties['NOCAD'] !== null ? autolinker.link(feature.properties['NOCAD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_area_CIMNC_8_0() {
+            return {
+                pane: 'pane_area_CIMNC_8',
+                opacity: 1,
+                color: 'rgba(227,26,28,1.0)',
+                dashArray: '10,5',
                 lineCap: 'square',
                 lineJoin: 'bevel',
                 weight: 1.0,
@@ -190,114 +460,63 @@
                 interactive: true,
             }
         }
-        map.createPane('pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0');
-        map.getPane('pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0').style.zIndex = 400;
-        map.getPane('pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0').style['mix-blend-mode'] = 'normal';
-        var layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0 = new L.geoJson(json_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0, {
+        map.createPane('pane_area_CIMNC_8');
+        map.getPane('pane_area_CIMNC_8').style.zIndex = 401;
+        map.getPane('pane_area_CIMNC_8').style['mix-blend-mode'] = 'normal';
+        var layer_area_CIMNC_8 = new L.geoJson(json_area_CIMNC_8, {
             attribution: '',
             interactive: true,
-            dataVar: 'json_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
-            layerName: 'layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
-            pane: 'pane_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0',
-            pmIgnore: true,
-            onEachFeature: pop_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0,
-            style: style_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0_0,
+            dataVar: 'json_area_CIMNC_8',
+            layerName: 'layer_area_CIMNC_8',
+            pane: 'pane_area_CIMNC_8',
+            onEachFeature: pop_area_CIMNC_8,
+            style: style_area_CIMNC_8_0,
         });
-        bounds_group.addLayer(layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0);
-        map.addLayer(layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0);
-
-
-        function pop_GISSDEESTADO_DE_MS_POLITICO_0(feature, layer) {
+        bounds_group.addLayer(layer_area_CIMNC_8);
+        function pop_area_APA_9(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
-                        <td colspan="2">' + (feature.properties['Municipio'] !== null ? autolinker.link(feature.properties['Municipio'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">zona</th>\
+                        <td>' + (feature.properties['zona'] !== null ? autolinker.link(feature.properties['zona'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">subzona</th>\
+                        <td>' + (feature.properties['subzona'] !== null ? autolinker.link(feature.properties['subzona'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">area(ha)</th>\
+                        <td>' + (feature.properties['area(ha)'] !== null ? autolinker.link(feature.properties['area(ha)'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             layer.bindPopup(popupContent, { maxHeight: 400 });
         }
 
-        function style_GISSDEESTADO_DE_MS_POLITICO_0_0() {
+        function style_area_APA_9_0() {
             return {
-                pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_0',
+                pane: 'pane_area_APA_9',
                 opacity: 1,
-                color: 'rgba(0,0,0,1.0)',
-                dashArray: '0 4 0',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.8,
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(0,0,0,0.0)',
-                interactive: false,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '10,5',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
             }
         }
-        map.createPane('pane_GISSDEESTADO_DE_MS_POLITICO_0');
-        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_0').style.zIndex = 400;
-        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_0').style['mix-blend-mode'] = 'normal';
-
-        var layer_GISSDEESTADO_DE_MS_POLITICO_0 = new L.geoJson(json_GISSDEESTADO_DE_MS_POLITICO_0, {
+        map.createPane('pane_area_APA_9');
+        map.getPane('pane_area_APA_9').style.zIndex = 400;
+        map.getPane('pane_area_APA_9').style['mix-blend-mode'] = 'normal';
+        var layer_area_APA_9 = new L.geoJson(json_area_APA_9, {
             attribution: '',
-            interactive: false,
-            dataVar: 'json_GISSDEESTADO_DE_MS_POLITICO_0',
-            layerName: 'layer_GISSDEESTADO_DE_MS_POLITICO_0',
-            pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_0',
-            pmIgnore: true,
-            onEachFeature: pop_GISSDEESTADO_DE_MS_POLITICO_0,
-            style: style_GISSDEESTADO_DE_MS_POLITICO_0_0,
+            interactive: true,
+            dataVar: 'json_area_APA_9',
+            layerName: 'layer_area_APA_9',
+            pane: 'pane_area_APA_9',
+            onEachFeature: pop_area_APA_9,
+            style: style_area_APA_9_0,
         });
-        bounds_group.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_0);
-        map.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_0);
-
-
-        function pop_GISSDEESTADO_DE_MS_POLITICO_1(feature, layer) {
-            var popupContent = '<table>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['Municipio'] !== null ? autolinker.link(feature.properties['NM_MUN'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                </table>';
-            layer.bindPopup(popupContent, { maxHeight: 400 });
-        }
-
-        function style_GISSDEESTADO_DE_MS_POLITICO_1_0() {
-            return {
-                pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_1',
-                opacity: 1,
-                color: 'rgba(0,0,0,1.0)',
-                dashArray: '0 4 0',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 0.8,
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(0,0,0,0.0)',
-                interactive: false,
-            }
-        }
-        map.createPane('pane_GISSDEESTADO_DE_MS_POLITICO_1');
-        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_1').style.zIndex = 400;
-        map.getPane('pane_GISSDEESTADO_DE_MS_POLITICO_1').style['mix-blend-mode'] = 'normal';
-
-        var layer_GISSDEESTADO_DE_MS_POLITICO_1 = new L.geoJson(json_GISSDEESTADO_DE_MS_POLITICO_1, {
-            attribution: '',
-            interactive: false,
-            dataVar: 'json_GISSDEESTADO_DE_MS_POLITICO_1',
-            layerName: 'layer_GISSDEESTADO_DE_MS_POLITICO_1',
-            pane: 'pane_GISSDEESTADO_DE_MS_POLITICO_1',
-            pmIgnore: true,
-            onEachFeature: pop_GISSDEESTADO_DE_MS_POLITICO_1,
-            style: style_GISSDEESTADO_DE_MS_POLITICO_1_0,
-        });
-        bounds_group.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_1);
-        map.addLayer(layer_GISSDEESTADO_DE_MS_POLITICO_1);
-
-        */
-
-
-        
-
-
-
-
+        bounds_group.addLayer(layer_area_APA_9);
 
 
         // basemaps layers -------------------------------------------------------------
@@ -308,7 +527,7 @@
         }).addTo(map);
 
         var ex = L.tileLayer.wms("https://bdgex.eb.mil.br/mapcache3857", {
-            layers: ['estados','capitais'],
+            layers: ['estados', 'capitais'],
             format: 'image/png',
         }).addTo(map);
 
@@ -325,49 +544,49 @@
         var imgs = L.tileLayer('data/1.RASTERS/imagens/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
         var srtm = L.tileLayer('data/1.RASTERS/srtm/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
         var carta = L.tileLayer('data/1.RASTERS/carta/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
         var buff = L.tileLayer('data/1.RASTERS/buffer_100m/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
         var drenag = L.tileLayer('data/1.RASTERS/drenagem/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
         var trecho_rod = L.tileLayer('data/1.RASTERS/rodovias/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
         var area_trans = L.tileLayer('data/1.RASTERS/area_trans/{z}/{x}/{y}.png', {
             minZoom: 1,
             maxZoom: 19,
-            tms:true,
+            tms: true,
 
         });
 
@@ -376,25 +595,30 @@
             "Blank": L.tileLayer(''),
             "cbers_2023": cbers,
             "rapideye_2012": rapideye,
-            "imagens":imgs,
-            "srtm":srtm,
+            "imagens": imgs,
+            "srtm": srtm,
             "carta_esp": carta,
 
         };
 
         L.control.layers(baseMaps, {
-            '<img src=""/> Transitabilidade_Bld': area_trans,
+
             '<img src=""/> Buffer_100m': buff,
             '<img src=""/> Drenagem': drenag,
             '<img src=""/> Trecho_Rod': trecho_rod,
-
-        
-        //    '<img src="legend/GISSDEESTADO_DE_MS_POLITICO_0.png" /> Sedes_Mun_MS': layer_SedesdosMunicpiosAglomeradosRuraiseUrbanos_0,
-        //    '<img src="legend/GISSDEESTADO_DE_MS_POLITICO_0.png" /> MS_POLITICO': layer_GISSDEESTADO_DE_MS_POLITICO_0,
-        //    '<img src="legend/GISSDEESTADO_DE_MS_POLITICO_0.png" /> MT_POLITICO': layer_GISSDEESTADO_DE_MS_POLITICO_1,
+            '<img src="legend/area_APA_9.png" /> area_APA': layer_area_APA_9,
+            '<img src="legend/area_CIMNC_8.png" /> area_CIMNC': layer_area_CIMNC_8,
+            '<img src="legend/Area_Dest_Com_Conv_7.png" /> Area_Dest_Com_Conv': layer_Area_Dest_Com_Conv_7,
+            '<img src="legend/Area_Edificada_6.png" /> Area_Edificada': layer_Area_Edificada_6,
+            '<img src="legend/Area_RecargaTopo_Morro_5.png" /> Area_Recarga-Topo_Morro': layer_Area_RecargaTopo_Morro_5,
+            '<img src="legend/Area_Selecionada_ESE_4.png" /> Area_Selecionada_ESE': layer_Area_Selecionada_ESE_4,
+            '<img src="legend/Estrada_Mussurepe_3.png" /> Estrada_Mussurepe': layer_Estrada_Mussurepe_3,
+            '<img src="legend/Vegetacao_2.png" /> Vegetacao': layer_Vegetacao_2,
+            '<img src="legend/Poligono_Tiro_1.png" /> Poligono_Tiro': layer_Poligono_Tiro_1,
+            '<img src="legend/Transitabilidade_Blindados_0.png" /> Transitabilidade_Blindados': layer_Transitabilidade_Blindados_0,
 
         }).addTo(map);
-        
+
 
 
         //abstract -------------------------------------------------------------
@@ -426,7 +650,7 @@
         document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
             .title += 'Search for a place';
 
-        
+
         // texto nos layers -------------------------------------------------------------
         //setBounds();
         /*
@@ -514,7 +738,7 @@
             rotateMode: true,
             oneBlock: false,
         });
-        
+
 
         function generateGeoJson() {
             var fg = L.featureGroup();
